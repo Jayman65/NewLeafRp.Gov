@@ -1,0 +1,97 @@
+import { useState } from "react";
+
+const categories = ["Open Cases", "Closed Cases", "Internal Affairs", "Evidence Locker"];
+
+export default function DetectiveForum() {
+  const [selectedCategory, setSelectedCategory] = useState("Open Cases");
+  const [cases, setCases] = useState([]);
+  const [newTitle, setNewTitle] = useState("");
+  const [newInvestigator, setNewInvestigator] = useState("");
+
+  const handleAddCase = () => {
+    if (newTitle.trim() === "") return;
+    const newCase = {
+      id: Date.now(),
+      title: newTitle,
+      investigator: newInvestigator || "Unassigned",
+      category: selectedCategory,
+      lastUpdated: "Just now",
+    };
+    setCases([...cases, newCase]);
+    setNewTitle("");
+    setNewInvestigator("");
+  };
+
+  const filteredCases = cases.filter((c) => c.category === selectedCategory);
+
+  return (
+    <div className="flex min-h-screen bg-gray-950 text-white">
+      {/* Sidebar */}
+      <aside className="w-64 bg-gray-900 p-6 border-r border-gray-800">
+        <h2 className="text-2xl font-bold mb-6">Detective Forum</h2>
+        <nav className="space-y-3 text-sm">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`block w-full text-left px-4 py-2 rounded ${
+                selectedCategory === cat
+                  ? "bg-gray-800 text-white"
+                  : "text-gray-400 hover:bg-gray-800"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Main */}
+      <main className="flex-1 p-10">
+        <h1 className="text-3xl font-semibold mb-6">{selectedCategory}</h1>
+
+        {/* Add new case */}
+        <div className="mb-6 space-y-3 max-w-xl">
+          <input
+            type="text"
+            placeholder="Case title"
+            className="w-full px-4 py-2 rounded bg-gray-900 border border-gray-800 placeholder-gray-600"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Investigator"
+            className="w-full px-4 py-2 rounded bg-gray-900 border border-gray-800 placeholder-gray-600"
+            value={newInvestigator}
+            onChange={(e) => setNewInvestigator(e.target.value)}
+          />
+          <button
+            onClick={handleAddCase}
+            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm font-medium"
+          >
+            Add Case
+          </button>
+        </div>
+
+        {/* Case list */}
+        {filteredCases.length > 0 ? (
+          <div className="space-y-4">
+            {filteredCases.map((c) => (
+              <div
+                key={c.id}
+                className="rounded-lg border border-gray-800 bg-gray-900 p-5"
+              >
+                <h3 className="text-lg font-bold">{c.title}</h3>
+                <p className="text-gray-400 text-sm">Investigator: {c.investigator}</p>
+                <p className="text-gray-600 text-xs">Last updated: {c.lastUpdated}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">No cases reported yet.</p>
+        )}
+      </main>
+    </div>
+  );
+}
